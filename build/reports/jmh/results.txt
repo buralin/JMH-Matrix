@@ -1,0 +1,5 @@
+Benchmark                               Mode  Cnt  Score   Error  Units
+SetOfBenchmarks.MatrixCublas              ss   10  0.057 ± 0.009   s/op
+SetOfBenchmarks.MatrixCudaKernel          ss   10  0.126 ± 0.034   s/op
+SetOfBenchmarks.MatrixCudaKernelShared    ss   10  0.128 ± 0.020   s/op
+SetOfBenchmarks.MatrixJava                ss   10  4.871 ± 0.079   s/op
