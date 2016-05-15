@@ -39,11 +39,12 @@ public class CudaKernelSharedMatrix implements MatrixInterface
 	{ 
 			// Enable exceptions and omit all subsequent error checks
 	       JCudaDriver.setExceptionsEnabled(true);
-	        alpha = 1;
-	        beta = 1;
+	       alpha = 1;
+	       beta = 1;
 	        
-	        int nn = n*n;
-	        int N = nn;
+	       int nn = n*n;
+	       int wA = n;
+	       int wB = n;
 	       // Initialize the driver and create a context for the first device.
 	       cuInit(0);
 	       CUdevice device = new CUdevice();
@@ -54,7 +55,7 @@ public class CudaKernelSharedMatrix implements MatrixInterface
 	       
 	       // Load the ptx file.
 	       CUmodule module = new CUmodule();
-	       cuModuleLoad(module, "MatrixMulKernelShared.ptx");
+	       cuModuleLoad(module, "MatrixMulSharedMemory.ptx");
 	       // Obtain a function pointer to the "add" function.
 	       CUfunction function = new CUfunction();
 	       cuModuleGetFunction(function, module, "matrixMulkernelShared");
@@ -75,11 +76,11 @@ public class CudaKernelSharedMatrix implements MatrixInterface
 	       
 	       // Set up the kernel parameters: A pointer to an array
 	       // of pointers which point to the actual values.
-	       Pointer kernelParameters = Pointer.to(Pointer.to(d_A),Pointer.to(d_B),Pointer.to(d_C), Pointer.to(new int[]{N}));
+	       Pointer kernelParameters = Pointer.to(Pointer.to(d_A),Pointer.to(d_B),Pointer.to(new int[]{wA}), Pointer.to(new int[]{wB}), Pointer.to(d_C));
 	       
 	       // Call the kernel function.
-	       int blockSizeX = 32;
-	       int blockSizeY = 32;
+	       int blockSizeX = 16;
+	       int blockSizeY = 16;
 	       int gridSizeX = (n/32)+1;
 	       int gridSizeY = 1;
 	       cuLaunchKernel(function,
@@ -98,6 +99,7 @@ public class CudaKernelSharedMatrix implements MatrixInterface
 	       cuMemFree(d_A);
 	       cuMemFree(d_B);
 	       cuMemFree(d_C);
+	       System.out.println("ERGEBNIS ******************** "+ C[9999]);
 	       return C;
 			
 	}
